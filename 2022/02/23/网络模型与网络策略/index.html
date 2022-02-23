@@ -23,46 +23,46 @@
   <meta name="description" content="Kubertnetes集群上运行的所有Pod资源默认都会从同一平面网络得到一个IP地址，无论是否处于同一名称空间，各Pod彼此之间都可使用各自的地址直接通信，Pod网络的管理由第三方项目以CNI插件方式完成。进一步来说，除了Pod网络管理，有相当一部分CNI网络插件还实现了网络策略，这些插件赋予管理员和用户通过自定义NetworkPolicy资源来管控Pod通信的能力。 容器网络模型Network">
 <meta property="og:type" content="article">
 <meta property="og:title" content="网络模型与网络策略">
-<meta property="og:url" content="https://marmotad.github.io/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/index.html">
+<meta property="og:url" content="https://marmotad.github.io/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/index.html">
 <meta property="og:site_name" content="marmotad">
 <meta property="og:description" content="Kubertnetes集群上运行的所有Pod资源默认都会从同一平面网络得到一个IP地址，无论是否处于同一名称空间，各Pod彼此之间都可使用各自的地址直接通信，Pod网络的管理由第三方项目以CNI插件方式完成。进一步来说，除了Pod网络管理，有相当一部分CNI网络插件还实现了网络策略，这些插件赋予管理员和用户通过自定义NetworkPolicy资源来管控Pod通信的能力。 容器网络模型Network">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140343118.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140433463.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140510175.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140600977.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140623865.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140640839.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140706545.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140722441.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140903448.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141222681.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141321489.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141337314.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141402977.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218142922007.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218143359115.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220222210712817.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164035327.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164057815.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164115486.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164145074.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164726217.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165047187.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165208447.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165347240.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165525797.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165542731.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165659812.png">
-<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165721382.png">
-<meta property="article:published_time" content="2022-02-10T02:31:33.000Z">
-<meta property="article:modified_time" content="2022-02-23T07:55:28.794Z">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140343118.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140433463.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140510175.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140600977.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140623865.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140640839.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140706545.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140722441.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140903448.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141222681.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141321489.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141337314.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141402977.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218142922007.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218143359115.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220222210712817.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164035327.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164057815.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164115486.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164145074.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164726217.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165047187.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165208447.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165347240.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165525797.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165542731.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165659812.png">
+<meta property="og:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165721382.png">
+<meta property="article:published_time" content="2022-02-23T02:31:33.000Z">
+<meta property="article:modified_time" content="2022-02-23T07:58:24.666Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="Kubernetes">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://marmotad.github.io/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140343118.png">
+<meta name="twitter:image" content="https://marmotad.github.io/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140343118.png">
 
-<link rel="canonical" href="https://marmotad.github.io/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/">
+<link rel="canonical" href="https://marmotad.github.io/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/">
 
 
 <script id="page-configurations">
@@ -182,7 +182,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://marmotad.github.io/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/">
+    <link itemprop="mainEntityOfPage" href="https://marmotad.github.io/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
@@ -204,16 +204,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-02-10 10:31:33" itemprop="dateCreated datePublished" datetime="2022-02-10T10:31:33+08:00">2022-02-10</time>
+              <time title="创建时间：2022-02-23 10:31:33 / 修改时间：15:58:24" itemprop="dateCreated datePublished" datetime="2022-02-23T10:31:33+08:00">2022-02-23</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-02-23 15:55:28" itemprop="dateModified" datetime="2022-02-23T15:55:28+08:00">2022-02-23</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -238,22 +232,22 @@
         <h1 id><a href="#" class="headerlink" title></a></h1><p>Kubertnetes集群上运行的所有Pod资源默认都会从同一平面网络得到一个IP地址，无论是否处于同一名称空间，各Pod彼此之间都可使用各自的地址直接通信，Pod网络的管理由第三方项目以CNI插件方式完成。进一步来说，除了Pod网络管理，有相当一部分CNI网络插件还实现了网络策略，这些插件赋予管理员和用户通过自定义NetworkPolicy资源来管控Pod通信的能力。</p>
 <h2 id="容器网络模型"><a href="#容器网络模型" class="headerlink" title="容器网络模型"></a>容器网络模型</h2><p>Network、IPC和UTS名称空间隔离技术是容器能够使用独立网络栈的根本，而操作系统的网络设备虚拟化技术是打通各容器间通信并构建起多样化网络拓扑的至关重要因素，在Linux系统上，这类的虚拟化设备类型有VETH、Bridge、VLAN、MAC VLAN、IP VLAN、VXLAN、MACTV和TAP/IPVTAP等。</p>
 <h3 id="容器网络通信模式"><a href="#容器网络通信模式" class="headerlink" title="容器网络通信模式"></a>容器网络通信模式</h3><p>在Host模式中，各容器共享宿主机的根网络名称空间，它们使用同一个接口设备和网络协议栈，因此，用户必须精心管理共享同一网络端口空间容器的应用与宿主机应用，以避免端口冲突。<br>Bridge模式对host模式进行了一定程度的改进，在该模式中，容器从一个或多个专用网络（地址池）中获取IP地址，并将该IP地址配置在自己的网络名称空间中的网络端口设备上。于是，拥有独立、隔离的网络名称空间的各容器有自己独占的端口空间，而不必再担心各容器及宿主机间的端口冲突。<br>这里反复提到的Bridge是指Linux内核支持的虚拟网桥设备，它模拟的是物理网桥设备，工作于数据链路层，根据习得的MAC地址表向设备端口转发数据帧。虚拟以太网接口设备对（veth pair）是连接虚拟网桥和容器的网络媒介：一端插入到容器的网络栈中，表现为通信接口（例如eth0等），另一端则于宿主机上关联虚拟网桥并被降级为当前网桥的“从设备”，失去调用网络协议栈处理数据包的资格，从而表现为桥设备的一个端口，如图10-1所示。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140343118.png" alt="image-20220218140343118"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140343118.png" alt="image-20220218140343118"></p>
 <p>Linux网桥提供的是宿主机内部的网络，同一主机上的各容器可基于网桥和ARP协议完成本地通信。而在宿主机上，网桥表现为一个网络接口并可拥有IP地址，如图10-2中的docker0会在docker daemon进程启动后被自动配置172.17.0.1/16的地址。于是，由宿主机发出的网络包可通过此桥接口送往连接至同一个桥上的其他容器，如图10-1上的Container-1或Container-2，这些容器通常需要由某种地址分配组件（IPAM）自动配置一个相关网络（例如72.17.0.0/16）中的IP地址。<br>但此私有网络中的容器却无法直接与宿主机之外的其他主机或容器进行通信，通常作为请求方，这些容器需要由宿主机上的iptables借助SNAT机制实现报文转发，而作为服务方时，它们的服务需要宿主机借助于iptables的DNAT规则进行服务暴露。因而，总结起来，配置容器使用Bridge网络的步骤大体有如下几个：</p>
 <blockquote>
 <p>1）若不存在，则需要先在宿主机上添加一个虚拟网桥；<br>2）为每个容器配置一个独占的网络名称空间；<br>3）生成一对虚拟以太网接口（如veth pair），将一端插入容器网络名称空间，一端关联至宿主机上的网桥；<br>4）为容器分配IP地址，并按需生成必要的NAT规则。</p>
 </blockquote>
 <p>尽管Bridge模型下各容器使用独立且隔离的网络名称空间，且彼此间能够互连互通，但跨主机的容器间通信时，请求报文会首先由源宿主机进行一次SNAT（源地址转换）处理，而后由目标宿主机进行一次DNAT（目标地址转换）处理方可送到目标容器，如图10-2所示。这种复杂的NAT机制将会使得网络通信管理的复杂度随容器规模增呈成几何倍数上升，而且基于ipables实现的NAT规则，也限制了解决方案的规模和性能。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140433463.png" alt="image-20220218140433463"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140433463.png" alt="image-20220218140433463"></p>
 <p>Kubernetes系统依然面临着类似的问题，只不过，跨节点的容器通信问题变成了更抽象的Pod资源问题。我们知道，Kubernetes将具有亲密关系的容器整合成Pod作为基础单元，并设计了专用的网络模型来支撑Kubernetes组件间以及与其他应用程序的通信。这种网络模型基于扁平网络结构，无须将主机端口映射到容器端口便能完成分布式环境中的容器间通信，并负责解决4类通信需求：同一Pod内容器间的通信、Pod间的通信、Service到Pod间的通信以及集群外部与Service之间的通信。</p>
 <h4 id="Pod内容器间通信"><a href="#Pod内容器间通信" class="headerlink" title="Pod内容器间通信"></a>Pod内容器间通信</h4><p>同一个Pod内运行的多个容器通过lo接口即可在本地内核协议栈上完成交互，如图10-3中的Pod P内的Container1和Container2之间的通信，这类似于同一主机上的多个进程间的本地通信。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140510175.png" alt="image-20220218140510175"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140510175.png" alt="image-20220218140510175"></p>
 <h4 id="分布式Pod间通信"><a href="#分布式Pod间通信" class="headerlink" title="分布式Pod间通信"></a>分布式Pod间通信</h4><p>各Pod对象需要运行在同一个平面网络中，每个Pod对象拥有一个虚拟网络接口和集群全局唯一的地址，该IP地址可用于直接与其他Pod进行通信，例如图10-4中的Pod P和Pod Q之间的通信。另外，运行Pod的各节点也会通过桥接设备等持有此平面网络中的一个IP地址，如图10-3中的cni0接口，这意味着Node到Pod间的通信也可直接在此网络进行。因此，Pod间的通信或Pod到Node间的通信类似于同一IP网络中的主机间进行的通信。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140600977.png" alt="image-20220218140600977"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140600977.png" alt="image-20220218140600977"></p>
 <p>Kubernetes设计了Pod通信模型。这些第三方插件要负责为各Pod设置虚拟网络接口、分配IP地址并将其接入到容器网络中等各种任务，以实现Pod间的直接通信。</p>
 <h4 id="Service与Pod间的通信"><a href="#Service与Pod间的通信" class="headerlink" title="Service与Pod间的通信"></a>Service与Pod间的通信</h4><p>Service资源的专用网络也称为集群网络，需要在启动kube-apiserver时由–service-cluster-ip-range选项进行指定，例如默认的10.96.0.0/12，每个Service对象在此网络中拥有一个称为Cluster-IP的固定地址。管理员或用户对Service对象的创建或更改操作，会由API Server存储完成后触发各节点上的kube-proxy，并根据代理模式的不同将该Service对象定义为相应节点上的iptables规则或ipvs规则，Pod或节点客户端对Service对象的IP地址的访问请求将由这些iptables或ipvs规则进行调度和转发，从而完成Pod与Service之间的通信，如图10-4所示。</p>
 <h4 id="集群外部客户端与Pod对象的通信"><a href="#集群外部客户端与Pod对象的通信" class="headerlink" title="集群外部客户端与Pod对象的通信"></a>集群外部客户端与Pod对象的通信</h4><p>引入集群外部流量到达Pod对象有4种方式，有两种是基于本地节点的端口（nodePort）或根网络名称空间（hostNetwork），另外两种则是基于工作在集群级别的NodePort或LoadBalancer类型的Service对象。不过，即便是四层代理的模式也要经由两级转发才能到达目标Pod资源：请求流量首先到达外部负载均衡器，由其调度至某个工作节点之上，而后再由工作节点的netfilter（kube-proxy）组件上的规则（iptables或ipvs）调度至某个目标Pod对象。<br>集群内的Pod间通信，即便通过Service进行“代理”和“调度”，但绝大部分都无须使用NAT，而是Pod间的直接通信。</p>
-<h3 id="CNI网络插件基础"><a href="#CNI网络插件基础" class="headerlink" title="CNI网络插件基础"></a>CNI网络插件基础</h3><p>CNI是容器引擎与遵循该规范网络插件的中间层，专用于为容器配置网络子系统，目前由RKT、Docker、Kubernetes、OpenShift和Mesos等相关的容器运行时环境所运行。<br>通常，遵循CNI规范的网络插件是一个可执行程序文件，它们可由容器编排系统（例如Kubernetes等）调用，负责向容器的网络名称空间插入一个网络接口并在宿主机上执行必要的任务以完成虚拟网络配置，因而通常被称为网络管理插件，即NetPlugin。随后，NetPlugin还需要借助IPAM插件为容器的网络接口分配IP地址，这意味着CNI允许将核心网络管理功能与IP地址分配等功能相分离，并通过插件组合的方式堆叠出一个完整的解决方案。简单来说，目前的CNI规范主要由NetPlugin和IPAM两个插件API组成，如图10-5所示。<br><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140623865.png" alt="image-20220218140623865">以下是对两个插件的简要说明。</p>
+<h3 id="CNI网络插件基础"><a href="#CNI网络插件基础" class="headerlink" title="CNI网络插件基础"></a>CNI网络插件基础</h3><p>CNI是容器引擎与遵循该规范网络插件的中间层，专用于为容器配置网络子系统，目前由RKT、Docker、Kubernetes、OpenShift和Mesos等相关的容器运行时环境所运行。<br>通常，遵循CNI规范的网络插件是一个可执行程序文件，它们可由容器编排系统（例如Kubernetes等）调用，负责向容器的网络名称空间插入一个网络接口并在宿主机上执行必要的任务以完成虚拟网络配置，因而通常被称为网络管理插件，即NetPlugin。随后，NetPlugin还需要借助IPAM插件为容器的网络接口分配IP地址，这意味着CNI允许将核心网络管理功能与IP地址分配等功能相分离，并通过插件组合的方式堆叠出一个完整的解决方案。简单来说，目前的CNI规范主要由NetPlugin和IPAM两个插件API组成，如图10-5所示。<br><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140623865.png" alt="image-20220218140623865">以下是对两个插件的简要说明。</p>
 <ul>
 <li>网络插件也称Main插件，负责创建/删除网络以及向网络添加/删除容器，它专注于连通容器与容器之间以及容器与宿主机之间的通信，同容器相关的网络设备通常都由该类插件所创建，例如Bridge、IP VLAN、MAC VLAN、loopback、PTP、VETH以及VLAN等虚拟设备。</li>
 <li>IPAM（IP Address Management），该类插件负责创建/删除地址池以及分配/回收容器的IP地址；目前，该类型插件的实现主要有host-local和dhcp两个，前一个基于预置的地址范围进行地址分配，而后一个通过DHCP协议获取地址。</li>
@@ -264,7 +258,7 @@
 <li>Underlay网络通常使用direct routing（直接路由）技术在Pod的各子网间路由Pod的IP报文，或使用Bridge、MAC VLAN或IP VLAN等技术直接将容器暴露给外部网络。</li>
 </ul>
 <p><font color="red">其实，Overlay网络的底层网络也就是承载网络，因此，Underlay网络的解决方案也就是一类非借助隧道协议而构建的容器通信网络。相较于承载网络，Overlay网络由于存在额外的隧道报文封装，会存在一定程度的性能开销。然而，用户在不少场景中可能会希望创建跨越多个L2或L3的逻辑网络子网，这就只能借助Overlay封装协议实现。为Pod配置网络接口是NetPlugin的核心功能之一，但不同的容器虚拟化网络解决方案中，为Pod的网络名称空间创建虚拟接口设备的方式也会有所不同，目前，较为注流的实现方式有veth（虚拟以太网)设备、多路复用及硬件交换3种，如图10-6所示。</font></p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140640839.png" alt="image-20220218140640839"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140640839.png" alt="image-20220218140640839"></p>
 <ul>
 <li>veth设备：创建一个网桥，并为每个容器创建一对虚拟以太网接口，一个接入容器内部，另一个留置于根名称空间内添加为Linux内核桥接功能或OpenvSwitch（OVS）网桥的从设备。</li>
 <li>多路复用：多路复用可以由一个中间网络设备组成，它暴露多个虚拟接口，使用数据包转发规则来控制每个数据包转到的目标接口；MAC VLAN技术为每个虚拟接口配置一个MAC地址并基于此地址完成二层报文收发，IP VLAN则是分配一个IP地址并共享单个MAC，并根据目标IP完成容器报文转发。</li>
@@ -272,13 +266,13 @@
 </ul>
 <p>一般说来，基于VXLAN Overlay网络的虚拟容器网络中，NetPlugin会使用虚拟以太网内核模块为每个Pod创建一对虚拟网卡；基于MAC VLAN/IP VLAN Underlay网络的虚拟容器网络中，NetPlugin会基于多路复用模式中的MAC VLAN/IP VLAN内核模块为每个Pod创建虚拟网络接口设备；而基于IP报文路由技术的Underlay网络中，各Pod接口设备通常也是借助veth设备完成。<br>相比较来说，IPAM插件的功能则要简单得多，目前可用的实现方案中，host-local从本地主机可用的地址空间范围中分配IP地址，它没有地址租约，属于静态分配机制；而dhcp插件则需要一个特殊的客户端守护进程（通常是dhcp插件的子组件）运行在宿主机之上，它充当本地主机上各容器中的DHCP客户端与网络中的DHCP服务器之间的代理，并适当地续定租约。<br>Kubernetes借助CNI插件体系来组合需要的网络插件完成容器网络编排功能。每次初始倾化或删除Pod对象时，kubelet都会调用默认的CNI插件创建一个虚拟设备接口附加到相关的底层网络，为其设置IP地址、路由信息并将其映射到Pod对象的网络名称空间。具体过程是，kubelet首先在默认的/etc/cni/net.d/目录中查找JSON格式的CNI配置文件，接着基于该配置文件中各插件的type属性到/opt/cni/bin/中查找相关的插件二进制文件，由该二进制程序基于提供的配置信息完成相应的操作。<br>kubelet基于包含命令参数CNI_ARGS、CNI_COMMAND、CNI_IFNAME、CNI_NETNS、CNI_CONTAINERID、CNI_PATH的环境变量调用CNI插件，而被调用的插件同样使用JSON格式的文本信息进行响应，描述操作结果和状态。Pod对象的名称和名称空间将作为CNI_ARGS变量的一部分进行传递（例如K8S_POD_NAMESPACE=default; K8S_POD_NAME=myapp-6d9f48c5d9-n77qp;）。它可以定义每个Pod对象或Pod网络名称空间的网络配置（例如，将每个网络名称空间放在不同的子网中）。</p>
 <h3 id="Overlay网络模型"><a href="#Overlay网络模型" class="headerlink" title="Overlay网络模型"></a>Overlay网络模型</h3><p>物理网络模型中，连通多个物理网桥上的主机的一个简单办法是通过媒介直接连接这些网桥设备，各个主机处于同一个局域网（LAN）之中，管理员只需要确保各个网桥上每个主机的IP地址不相互冲突即可。类似地，若能够直接连接宿主机上的虚拟网桥形成一个大的局域网，就能在数据链路层打通各宿主机上的内部网络，让容器可通过自有IP地址直接通信。为避免各容器间的IP地址冲突，一个常见的解决方案是将每个宿主机分配到同一网络中的不同子网，各主机基于自有子网向其容器分配IP地址。<br>显然，主机间的网络通信只能经由主机上可对外通信的网络接口进行，跨主机在数据链路层直接连接虚拟网桥的需求必然难以实现，除非借助宿主机间的通信网络构建的通信“隧道”进行数据帧转发。这种于某个通信网络之上构建出的另一个逻辑通信网络通常即10.1.2节提及的Overlay网络或Underlay网络。图10-7为Overlay网络功能示意图。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140706545.png" alt="image-20220218140706545"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140706545.png" alt="image-20220218140706545"></p>
 <p>隧道转发的本质是将容器双方的通信报文分别封装成各自宿主机之间的报文，借助宿主机的网络“隧道”完成数据交换。这种虚拟网络的基本要求是各宿主机只需支持隧道协议即可，对于底层网络没有特殊要求。<br>VXLAN协议是目前最流行的Overlay网络隧道协议之一，它也是由IETF定义的NVO3（Network Virtualization over Layer 3）标准技术之一，采用L2 over L4（MAC-in-UDP）的报文封装模式，将二层报文用三层协议进行封装，可实现二层网络在三层范围内进行扩展，将“二层域”突破规模限制形成“大二层域”。那么，同一大二层域就类似于传统网络中VLAN（虚拟局域网）的概念，只不过在VXLAN网络中，它被称作Bridge-Domain，以下简称为BD。类似于不同的VLAN需要通过VLAN ID进行区分，各BD要通过VNI加以标识。但是，为了确保VXLAN机制通信过程的正确性，涉及VXLAN通信的IP报文一律不能分片，这就要求物理网络的链路层实现中必须提供足够大的MTU值，或修改其MTU值以保证VXLAN报文的顺利传输。<br>VXLAN的显著的优势之一是对底层网络没有侵入性，管理员只需要在原有网络之上添加一些额外设备即可构建出虚拟的逻辑网络来。这个额外添加的设备称为VTEP（VXLAN Tunnel Endpoints），它工作于VXLAN网络的边缘，负责相关协议报文的封包和解包等操作，从作用来说相当于VXLAN隧道的出入口设备。<br>VTEP代表着一类支持VXLAN协议的交换机，而支持VXLAN协议的操作系统也可将一台主机模拟为VTEP，Linux内核自3.7版本开始通过vxlan内核模块原生支持此协议。于是，各主机上由虚拟网桥构建的LAN便可借助vxlan内核模块模拟的VTEP设备与其他主机上的VTEP设备进行对接，形成隧道网络。同一个二层域内的各VTEP之间都需要建立VXLAN隧道，因此跨主机的容器间直接进行二层通信的VXLAN隧道是各VTEP之间的点对点隧道，如图10-8所示。对于Flannel来说，这个VTEP设备就是各节点上生成flannel.1网络接口，其中的“1”是VXLAN中的BD标识VNI，因而同一Kubernetes集群上所有节点的VTEP设备属于VNI为1的同一个BD。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140722441.png" alt="image-20220218140722441"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140722441.png" alt="image-20220218140722441"></p>
 <p>类似VLAN的工作机制，相同VXLAN VNI在不同VTEP之间的通信要借助二层网关来完成，而不同VXLAN之间，或者VXLAN同非VXLAN之间的通信则需经由三层网关实现。VXLAN支持使用集中式和分布式两种形式的网关：前者支持流量的集中管理，配置和维护较为简单，但转发效率不高，且容易出现瓶颈和网关可用性问题；后者以各节点为二层或三层网关，消除了瓶颈。<br>然而，VXLAN网络中的容器在首次通信之前，源VTEP又如何得知目标服务器在哪一个VTEP，并选择正确的路径传输通信报文呢？常见的解决思路一般有两种：多播和控制中心。多播是指同一个BD内的各VTEP加入同一个多播域中，通过多播报文查询目标容器所在的目标VTEP。而控制中心则在某个共享的存储服务上保存所有容器子网及相关VTEP的映射信息，各主机上运行着相关的守护进程，并通过与控制中心的通信获取相关的映射信息。Flannel默认的VXLAN后端采用的是后一种方式，它把网络配置信息存储在etcd系统上。<br>Linux内核自3.7版本开始支持vxlan模块，此前的内核版本可以使用UDP、IPIP或GRE隧道技术。事实上，考虑到当今公有云底层网络的功能限制，Overlay网络反倒是一种最为可行的容器网络解决方案，仅那些更注重网络性能的场景才会选择Underlay网络。</p>
 <h3 id="Underlay网络模型"><a href="#Underlay网络模型" class="headerlink" title="Underlay网络模型"></a>Underlay网络模型</h3><p>Underlay网络就是传统IT基础设施网络，由交换机和路由器等设备组成，借助以太网协议、路由协议和VLAN协议等驱动，它还是Overlay网络的底层网络，为Overlay网络提供数据通信服务。容器网络中的Underlay网络是指借助驱动程序将宿主机的底层网络接口直接暴露给容器使用的一种网络构建技术，较为常见的解决方案有MAC VLAN、IP VLAN和直接路由等。</p>
 <h4 id="MAC-VLAN"><a href="#MAC-VLAN" class="headerlink" title="MAC VLAN"></a>MAC VLAN</h4><p>MAC VLAN支持在同一个以太网接口上虚拟出多个网络接口，每个虚拟接口都拥有唯一的MAC地址，并可按需配置IP地址。通常这类虚拟接口被网络工程师称作子接口，但在MAC VLAN中更常用上层或下层接口来表述。与Bridge模式相比，MAC VLAN不再依赖虚拟网桥、NAT和端口映射，它允许容器以虚拟接口方式直接连接物理接口。图10-9给出了Bridge与MAC VLAN网络对比示意图。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140903448.png" alt="image-20220218140903448"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218140903448.png" alt="image-20220218140903448"></p>
 <p>MAC VLAN有Private、VEPA、Bridge和Passthru几种工作模式，它们各自的工作特性如下。</p>
 <ul>
 <li>Private：禁止构建在同一物理接口上的多个MAC VLAN实例（容器接口）彼此间的通信，即便外部的物理交换机支持“发夹模式”也不行。</li>
@@ -288,9 +282,9 @@
 </ul>
 <p>除了Passthru模式外的容器流量将被MAC VLAN过滤而无法与底层主机通信，从而将主机与其运行的容器完全隔离，其隔离级别甚至高于网桥式网络模型，这对于有多租户需求的场景尤为有用。由于各实例都有专用的MAC地址，因此MAC VLAN允许传输广播和多播流量，但它要求物理接口工作于混杂模式，很多公有云环境中并不允许使用混杂模式，这意味着MAC VLAN更适用于本地网络环境。<br>需要注意的是，MAC VLAN为每个容器使用一个唯一的MAC地址，这可能会导致具有安全策略以防止MAC欺骗的交换机出现问题，因为这类交换机的每个接口只允许连接一个MAC地址。另外，有些物理网卡存在可支撑的MAC地址数量上限。</p>
 <h4 id="IP-VLAN"><a href="#IP-VLAN" class="headerlink" title="IP VLAN"></a>IP VLAN</h4><p>IP VLAN类似于MAC VLAN，它同样创建新的虚拟网络接口并为每个接口分配唯一的IP地址，不同之处在于，每个虚拟接口将共享使用物理接口的MAC地址，从而不再违反防止MAC欺骗的交换机的安全策略，且不要求在物理接口上启用混杂模式，如图10-10所示。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141222681.png" alt="image-20220218141222681"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141222681.png" alt="image-20220218141222681"></p>
 <p>IP VLAN有L2和L3两种模型，其中IP VLAN L2的工作模式类似于MAC VLAN Bridge模式，上层接口（物理接口）被用作网桥或交换机，负责为下层接口交换报文；而IP VLAN L3模式中，上层接口扮演路由器的角色，负责为各下层接口路由报文，如图10-11所示。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141321489.png" alt="image-20220218141321489"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141321489.png" alt="image-20220218141321489"></p>
 <p>IP VLAN L2模型与MAC VLAN Bridge模型都支持ARP协议和广播流量，它们拥有直接接入网桥设备的网络接口，能够通过802.1d数据包进行泛洪和MAC地址学习。但IP VLAN L3模式下，网络栈在容器内处理，不支持多播或广播流量，从这个意义上讲，它的运行模式与路由器的报文处理机制相同。<br>虽然支持多种网络模型，但MAC VLAN和IP VLAN不能同时在同一物理接口上使用。Linux内核文档中强调，MAC VLAN和IP VLAN具有较高的相似度，因此，通常仅在必须使用IP VLAN的场景中才不使用MAC VLAN。一般说来，强依赖于IP VLAN的场景有如下几个：</p>
 <ul>
 <li>Linux主机连接到的外部交换机或路由器启用了防止MAC地址欺骗的安全策略；</li>
@@ -299,8 +293,8 @@
 </ul>
 <p>802.1q配置接口不具有持久性，因此需依赖管理员通过网络启动脚本保持配置。</p>
 <h4 id="直接路由"><a href="#直接路由" class="headerlink" title="直接路由"></a>直接路由</h4><p>“直接路由”模型放弃了跨主机容器在L2的连通性，而专注于通过路由协议提供容器在L3的通信方案。这种解决方案因为更易于集成到现在的数据中心的基础设施之上，便捷地连接容器和主机，并在报文过滤和隔离方面有着更好的扩展能力及更精细的控制模型，因而成为容器化网络较为流行的解决方案之一。<br>一个常用的直接路由解决方案如图10-12所示，每个主机上的各容器在二层通过网桥连通，网关指向当前主机上的网桥接口地址。跨主机的容器间通信，需要依据主机上的路由表指示完成报文路由，因此每个主机的物理接口地址都有可能成为另一个主机路由报文中的“下一跳”，这就要求各主机的物理接口必须位于同一个L2网络中。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141337314.png" alt="image-20220218141337314"></p>
-<p>于是，在较大规模的主机集群中，问题的关键便转向如何更好地为每个主机维护路由表信息。常见的解决方案有：①Flannel host-gw使用存储总线etcd和工作在每个节点上的flanneld进程动态维护路由；②Calico使用BGP（Border Gateway Protocol）协议在主机集群中自动分发和学习路由信息。与Flannel不同的是，Calico并不会为容器在主机上使用网桥，而是仅为每个容器生成一对veth设备，留在主机上的那一端会在主机上生成目标地址，作为当前容器的路由条目，如图10-13所示。<br><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141402977.png" alt="image-20220218141402977"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141337314.png" alt="image-20220218141337314"></p>
+<p>于是，在较大规模的主机集群中，问题的关键便转向如何更好地为每个主机维护路由表信息。常见的解决方案有：①Flannel host-gw使用存储总线etcd和工作在每个节点上的flanneld进程动态维护路由；②Calico使用BGP（Border Gateway Protocol）协议在主机集群中自动分发和学习路由信息。与Flannel不同的是，Calico并不会为容器在主机上使用网桥，而是仅为每个容器生成一对veth设备，留在主机上的那一端会在主机上生成目标地址，作为当前容器的路由条目，如图10-13所示。<br><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218141402977.png" alt="image-20220218141402977"></p>
 <p>显然，较Overlay来说，无论是MAC VLAN、IP VLAN还是直接路由机制的Underlay网络模型的实现，它们因无须额外的报文开销而通常有着更好的性能表现，但对底层网络有着更多的限制条件。</p>
 <h3 id="配置CNI插件"><a href="#配置CNI插件" class="headerlink" title="配置CNI插件"></a>配置CNI插件</h3><p>CNI具有很强的扩展性和灵活性，例如，如果用户对某个插件有特殊的需求，可以通过输入中的args和环境变量CNI_ARGS传递，然后在插件中实现自定义的功能，这大大增加了它的扩展性。CNI插件把main和ipam分开，为用户提供了自由组合它们的机制，甚至一个CNI插件也可以直接调用另外一个插件。<br>CNI项目中有两个代码仓库：一个是提供用于开发CNI网络插件的库文件libcni，以及命令行工具cnitool的containernetworking/cni；另一个是CNI内置的插件程序containernetworking/plugins，它目前附带了如下几类网络插件。<br>1）main类别中，各插件主要用于创建容器和容器接口，内置的实现有如下几个。</p>
 <ul>
@@ -396,7 +390,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">root@k8s-node01:~# ip neighbour show | awk &#x27;$3==&quot;flannel.1&quot;&#123;print $0&#125;&#x27;</span><br><span class="line">10.244.2.0 dev flannel.1 lladdr be:f8:5a:a5:6e:d3 PERMANENT</span><br><span class="line">10.244.0.0 dev flannel.1 lladdr 52:2b:52:42:dc:ed PERMANENT</span><br><span class="line">10.244.3.0 dev flannel.1 lladdr 32:d3:60:46:93:47 PERMANENT</span><br></pre></td></tr></table></figure>
 
 <p>VXLAN协议使用UDP报文封装隧道内层数据帧，Pod发出的报文经隧道入口flannel.1封装成数据帧，再由flanneld进程（客户端）封装成UDP报文，之后发往目标Pod对象所在节点的flanneld进程（服务端）。该UDP报文就是所谓的VXLAN隧道，它会在已经生成的帧报文之外再封装一组协议头部，如图10-15所示为VXLAN头部、外层UDP头部、外层IP头部和外层帧头部。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218142922007.png" alt="image-20220218142922007"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218142922007.png" alt="image-20220218142922007"></p>
 <p>该UDP报文的IP头部中，源地址为当前节点某接口的IP地址，目标地址应该为目标Pod所在节点的某接口的IP地址。但本地节点之上并没有任何路由信息帮助指向目标节点，由flanneld生成的路由中仅指明了到达目标Pod时的隧道出口的flannel.1接口的IP地址。事实上，Flannel把flannel.1接口也作为网桥设备使用，该设备上附加了一个同样由flanneld维护的、称为FDB（Forwarding Database）的转发数据库。该数据库指明了到达目标节点flannel.1接口需要经由的下一跳IP，该IP是目标Pod所在节点的IP地址，即外部IP头部中的目标IP。下面的转发条目取自k8s-node01节点，各条目的功能做了简单注释，这些条目分别指明了到达集群中不同的节点的flannel.1接口时需要经过的下一跳IP地址。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">root@k8s-node01:~# bridge fdb show flannel.1 | awk &#x27;$3==&quot;flannel.1&quot;&#123;print $0&#125;&#x27;</span><br><span class="line">32:d3:60:46:93:47 dev flannel.1 dst 172.29.9.13 self permanent   # 转发至k8s-node03节点</span><br><span class="line">be:f8:5a:a5:6e:d3 dev flannel.1 dst 172.29.9.12 self permanent   # 转发至k8s-node02节点</span><br><span class="line">52:2b:52:42:dc:ed dev flannel.1 dst 172.29.9.1 self permanent    # 转发至k8s-master01节点</span><br></pre></td></tr></table></figure>
 
@@ -412,7 +406,7 @@
 </ul>
 <p>其中，直接路由参数能够配置Flannel实现三层转发式的容器网关，该网关能够以直接路由方式在Pod间转发通信报文。</p>
 <h3 id="直接路由-1"><a href="#直接路由-1" class="headerlink" title="直接路由"></a>直接路由</h3><p>为了提升性能，Flannel的VXLAN后端还支持DirectRouting模式，即在集群中的各节点上添加必要的路由信息，让Pod间的IP报文通过节点的二层网络直接传送，如图10-16所示。仅在通信双方的Pod对象所在的节点跨IP网络时，才启用传统的VXLAN隧道方式转发通信流量。若Kubernetes集群节点全部位于单个二层网络中，则DirectRouting模式下的Pod间通信流量基本接近于直接使用二层网络。即便节点分布在有限的几个可互相通信的网络中的Kubernetes集群来说，合理的应用部署拓扑也能省去相当一部分的隧道开销。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218143359115.png" alt="image-20220218143359115"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218143359115.png" alt="image-20220218143359115"></p>
 <p>对于托管部署在Kubernetes上的Flannel来说，修改kube-system名称空间下的configmaps/kube-flannel-cfg资源，为VXLAN后端添加DirectRouting子键，并设置其值为true即可，如下面的配置示例。</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">net-conf.json<span class="punctuation">:</span> |</span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;Network&quot;</span><span class="punctuation">:</span> <span class="string">&quot;10.244.0.0/16&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;Backend&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;Type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;VxLAN&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Directrouting&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
@@ -426,24 +420,24 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">~# </span><span class="language-bash">tcpdump -i ens3 -en tcp port 80</span></span><br><span class="line">17:16:44.883691 52:54:00:66:b9:c1 &gt; 52:54:00:08:99:ed, ethertype IPv4 (0x0800), length 140: 10.244.1.20.53456 &gt; 10.244.2.16.80: Flags [P.], seq 1:75, ack 1, win 507, options [nop,nop,TS val 3205078281 ecr 2860494615], length 74: HTTP: GET / HTTP/1.1</span><br><span class="line">……</span><br><span class="line">17:16:44.884831 52:54:00:08:99:ed &gt; 52:54:00:66:b9:c1, ethertype IPv4 (0x0800), length 83: 10.244.2.16.80 &gt; 10.244.1.20.53456: Flags [P.], seq 1:18, ack 75, win 502, options [nop,nop,TS val 2860494616 ecr 3205078281], length 17: HTTP: HTTP/1.0 200 OK</span><br></pre></td></tr></table></figure>
 
 <p>显然，这种路由规则无法表达跨二层网络的节点上Pod间通信的诉求，因为到达目标网络（某Pod子网）的下一跳地址无法指向另一个网络中的节点地址。因而，集群中的每个节点上依然保留有VXLAN隧道相关的flannel.1设备，以支持那些跨IP网络的节点上的Pod间通信。</p>
-<h3 id="host-gw后端"><a href="#host-gw后端" class="headerlink" title="host-gw后端"></a>host-gw后端</h3><p>Flannel的host-gw后端通过添加必要的路由信息，并使用节点的二层网络直接发送Pod间的通信报文，其工作方式类似于VXLAN后端中的直接路由功能，但不包括该后端支持的隧道转发能力，这意味着host-gw后端要求各节点必须位于同一个二层网络中。其工作模型示意图如图10-17所示。因完全不会用到VXLAN隧道，所以使用了host-gw后端的Flannel网络也就无须用到VTEP设备flannel.1。<br><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220222210712817.png" alt="image-20220222210712817">host-host-gw后端没有多余的配置参数，直接设定配置文件中的Backend.Type键的值为host-gw关键字即可。同样，直接修改kube-system名称空间中的configmaps/kube-flannel.cfg配置文件，类似下面配置示例中的内容即可。</p>
+<h3 id="host-gw后端"><a href="#host-gw后端" class="headerlink" title="host-gw后端"></a>host-gw后端</h3><p>Flannel的host-gw后端通过添加必要的路由信息，并使用节点的二层网络直接发送Pod间的通信报文，其工作方式类似于VXLAN后端中的直接路由功能，但不包括该后端支持的隧道转发能力，这意味着host-gw后端要求各节点必须位于同一个二层网络中。其工作模型示意图如图10-17所示。因完全不会用到VXLAN隧道，所以使用了host-gw后端的Flannel网络也就无须用到VTEP设备flannel.1。<br><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220222210712817.png" alt="image-20220222210712817">host-host-gw后端没有多余的配置参数，直接设定配置文件中的Backend.Type键的值为host-gw关键字即可。同样，直接修改kube-system名称空间中的configmaps/kube-flannel.cfg配置文件，类似下面配置示例中的内容即可。</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">net-conf.json<span class="punctuation">:</span> |</span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;Network&quot;</span><span class="punctuation">:</span> <span class="string">&quot;10.244.0.0/16&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;Backend&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;Type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;host-gw&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
 <p>配置完成后，集群中的各节点会生成类似VXLAN后端的DirectRouting路由及iptables规则，以转发Pod网络的通信报文，它完全省去了隧道转发模式的额外开销。代价是，对于非同一个二层网络的报文转发，host-gw完全无能为力。相对而言，VXLAN的DirectRouting后端转发模式兼具VXLAN后端和host-gw后端的优势，既保证了传输性能，又具备跨二层网络转发报文的能力。<br>当Kubernetes集群规模较大时，其路由信息的规模也将变得庞大且不易维护。相比较来说，Calico通过BGP协议自动维护路由条目，较之Flannel以etcd为总线以上报、查询和更新配置的工作逻辑更加高效和易于维护，因而更适用于大型网络。</p>
 <h2 id="Calico网络插件"><a href="#Calico网络插件" class="headerlink" title="Calico网络插件"></a>Calico网络插件</h2><p>与Flannel相比，Calico的一个显著优势是对网络策略的支持，它允许用户动态定义访问控制规则以管控进出容器的数据报文，从而为Pod间通信按需施加安全策略。<br>Calico是一个三层的虚拟网络解决方案，它把每个节点都当作虚拟路由器（vRouter），并把每个节点上的Pod都当作是“节点路由器”后的一个终端设备并为其分配一个IP地址。各节点路由器通过BGP协议学习生成路由规则，从而实现不同节点上Pod间的互联互通，如图10-18所示。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164035327.png" alt="image-20220218164035327"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164035327.png" alt="image-20220218164035327"></p>
 <p>BGP是互联网上一个核心的去中心化自治路由协议，它通过维护IP路由表或“前缀”表来实现自治系统（AS）之间的可达性，通常作为大规模数据中心维护不同的自治系统之间路由信息的矢量路由协议。Linux内核原生支持BGP，因而我们可轻易把一台Linux主机配置成为边界网关。<br>Calico把Kubernetes集群环境中的每个节点上的Pod所组成的网络视为一个自治系统，而每个节点也就自然由各自的Pod对象组成虚拟网络，进而形成自治系统的边界网关。各节点间通过BGP协议交换路由信息并生成路由规则。但考虑到并非所有网络都能支持BGP，而且BGP路由模型要求所有节点必须要位于同一个二层网络，所以Calico还支持基于IPIP和VXLAN的Overlay网络模型，它们的工作模式与Flannel的VXLAN和IPIP模型并无显著不同。<br>类似Flannel在VXLAN后端启用DirectRouting时的网络模型，Calico也支持混合使用路由和Overlay网络模型，BGP路由模型用于二层网络的高性能通信，IP-IP或VXLAN用于跨子网的节点间报文转发，如图10-19所示。<font color="red">IP-IP协议包头非常小，理论上它的速度要比VXLAN稍快一点，但安全性更差。</font></p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164057815.png" alt="image-20220218164057815"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164057815.png" alt="image-20220218164057815"></p>
 <p>需要注意的是，Calico网络提供的在线部署清单中默认使用的是IPIP隧道网络，而非BGP或者混合模型，因为它假设节点的底层网络不支持BGP协议。明确需要使用BGP或混合模型时，需要事先将清单下载至本地，按需修改后方可部署在Kubernetes集群之上。</p>
 <h3 id="Calico架构"><a href="#Calico架构" class="headerlink" title="Calico架构"></a>Calico架构</h3><p>Calico的系统组件主要有Felix、BGP路由反射器、编排系统插件、BIRD和etcd存储系统等，各组件间的关系如图10-20所示。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164115486.png" alt="image-20220218164115486"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164115486.png" alt="image-20220218164115486"></p>
 <p>BGP模式下的Calico所承载的各Pod资源直接基于vRouter经由基础网络进行互联，它非叠加、无隧道、不使用VRF表，也不依赖于NAT，因此每个工作负载都可以直接配置使用公网IP接入互联网，当然，也可以按需使用网络策略控制它的网络连通性。<br>（1）Felix<br>Felix是运行于各节点上守护进程，它主要负责完成接口管理、路由规划、ACL规划和状态报告几个核心任务，从而为各端点（VM或Container）生成连接机制。</p>
 <blockquote>
 <p>1）接口管理，负责创建网络接口、生成必要信息并送往内核，以确保内核能正确处理各端点的流量，尤其是要确保目标节点MAC能响应当前节点上各工作负载的MAC地址的ARP请求，以及为Felix管理的接口打开转发功能。另外，接口管理还要监控各接口的变动以确保规则能得到正确应用。<br>2）路由规划，负责为当前节点上运行的各端点在内核FIB（Forwarding Information Base）中生成路由信息，以保证到达当前节点的报文可正确转发给端点。<br>3）ACL规划，负责在Linux内核中生成ACL，实现仅放行端点间的合规流量，并确保流量不能绕过Calico等安全措施。<br>4）状态报告，负责提供网络健康状态的相关数据，尤其是报告由Felix管理的节点上的错误和问题。这些报告数据会存储在etcd，供其他组件或网络管理员使用。</p>
 </blockquote>
 <p>（2）编排系统插件<br>编排系统插件的主要功能是将Calico整合进所在的编排系统中，例如Kubernetes或OpenStack等。它主要负责完成API转换，从而让管理员和用户能够无差别地使用Calico的网络功能。换句话说，编排系统通常有自己的网络管理API，相应的插件要负责将对这些API的调用转换为Calico的数据模型，并存储到Calico的存储系统中。因而，编排插件的具体实现依赖于底层编排系统，不同的编排系统有各自专用的插件。<br>（3）etcd存储系统<br>利用etcd，Calico网络可实现为有明确状态（正常或故障）的系统，且易于通过扩展应对访问压力的提升，避免自身成为系统瓶颈。另外，etcd也是Calico各组件的通信总线。<br>（4）BGP客户端<br>Calico要求在每个运行着Felix的节点上同时运行一个称为BIRD的守护进程，它是BGP协议的客户端，负责将Felix生成的路由信息载入内核并通告给整个网络中。<br>（5）BGP路由反射器<br>Calico在每一个计算节点利用Linux内核实现了一个高效的vRouter（虚拟路由器）进行报文转发。每个vRouter通过BGP协议将自身所属节点运行的Pod资源的IP地址信息，基于节点上的专用代理程序（Felix）生成路由规则向整个Calico网络内传播。尽管小规模部署能够直接使用BGP网格模型，但随着节点数量（假设为N）的增加，这些连接的数量就会以N2的规模快速增长，从而给集群网络带来巨大的压力。因此，一般建议大规模的节点网络使用BGP路由反射器进行路由学习，BGP的点到点通信也就转为与中心点的单路通信模型。另外，出于冗余考虑，生产实践中应该部署多个BGP路由反射器。而对于Calico来说，BGP客户端程序除了作为客户端使用外，也可以配置为路由反射器。<br>另外，Calico可将关键配置抽象成资源类型，并允许用户按需定义资源对象以完成系统配置，这些资源对象保存在Datastore中，Datastore可以是独立管理的etcd存储系统，也可以是Kubernetes API封装的集群状态存储系统（即Kubernetes使用的etcd存储系统）。Calico专有的资源类型有十几种，包括IPPool（IP地址池）、NetworkPolicy（网络策略）、BGPConfiguration（BGP配置参数）和FelixConfiguration（Felix配置参数）等。类似于Kubernetes API资源的定义，这些资源的配置格式同样以JSON使用apiVersion、kind、metadata和spec等一级字段进行定义，并能够使用calicoctl客户端工具进行管理，也支持由kublet借助CRD进行这类资源的管理。<br>以Kubernetes API为Datastore的部署场景中，Calico还需将这些资源类型相应定义为Kubernetes上的CRD。</p>
 <h3 id="Calico配置基础"><a href="#Calico配置基础" class="headerlink" title="Calico配置基础"></a>Calico配置基础</h3><p>与Kubernetes集群整合时，Calico需要配置calico-node和calico-kube-controllers两个重要组件，如图10-21所示，各组件通过Datastore读取与自身相关的资源定义完成配置。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164145074.png" alt="image-20220218164145074"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164145074.png" alt="image-20220218164145074"></p>
 <ul>
 <li>calico/node：Calico在Kubernetes集群每个节点运行的节点代理，负责提供felix、bird4、bird6和confd等守护进程。</li>
 <li>calico/kube-controllers：Calico运行在Kubernetes之上的自定义控制器，也是Calico协同Kubernetes的插件。</li>
@@ -474,7 +468,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">~$ </span><span class="language-bash">kubectl get pods -n kube-system -o wide | awk <span class="string">&#x27;/^calico-(node|kube-controller)/&#123;print&#125;&#x27;</span></span></span><br></pre></td></tr></table></figure>
 
 <p>工作在IPIP模式的Calico会在每个节点上创建一个tunl0接口作为隧道出入口来封装IPIP隧道报文。Calico会为每一个Pod资源创建一对veth设备，其中一端作为Pod的网络接口，另一端（名称以cali为前缀，后跟随机字串）留置在节点的根网络名称空间，它未使用风格模式，因而并未关联成为任何虚拟网桥设备的从接口，如图10-22所示。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164726217.png" alt="image-20220218164726217"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218164726217.png" alt="image-20220218164726217"></p>
 <p>IPIP隧道网络仍需依赖于BGP维护节点间的可达性。部署完成后，Calico会通过BGP协议在每个节点上生成到达Kubernetes集群中其他各节点的Pod子网路由信息。下面的路由条件截取自k8s-node01主机，它们是由各节点上的BIRD以点对点的方式（node-to-node mesh）向网络中的其他节点进行通告并学习其他节点的通告而得。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">10.244.0.0/24 via 172.29.9.1 dev tunl0 proto bird onlink </span><br><span class="line">blackhole 10.244.1.0/24 proto bird </span><br><span class="line">10.244.2.0/24 via 172.29.9.12 dev tunl0 proto bird onlink </span><br><span class="line">10.244.3.0/24 via 172.29.9.13 dev tunl0 proto bird onlink</span><br></pre></td></tr></table></figure>
 
@@ -503,7 +497,7 @@
 <p>我们可将上面命令输出的结果保存于本地文件中，修改其特定属性值后，再重新应用（apply）到Datastore从而完成配置更新，例如添加disabled: true以禁用指定的地址池等；也可同时修改资源名称和特定属性值后再应用到Datastore上以创建新的资源。<br>再如，下面的命令打印了地址池中相关地址块与IP地址的分配状态，包括地址池及各地址块中的IP总数、已分配数量和可用数量等。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">~$ </span><span class="language-bash">calicoctl ipam show --show-blocks</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165047187.png" alt="image-20220218165047187"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165047187.png" alt="image-20220218165047187"></p>
 <p><font color="red">直接以ectd为Datastore的场景中，calicoctl则要使用由etcd信任的CA所签发的数字证书认证到etcd，主流的配置方式同样有环境变量和配置文件两种。</font></p>
 <h3 id="BGP网络与BGP-Reflector"><a href="#BGP网络与BGP-Reflector" class="headerlink" title="BGP网络与BGP Reflector"></a>BGP网络与BGP Reflector</h3><p>一般来说，仅在那些不支持用户自定义BGP配置的网络中才会完全使用IPIP或VXLAN隧道网络，对于自主可控且规模较大的网络环境，非常有必要启用BGP降低网络开销以提升传输性能。对于Calico来说，修改ipPool属性相应的配置便可调整使用的网络类型。以此前部署的Calico系统默认使用的地址池default-ipv4-ippool为例，获取该资源的配置清单并保存为本地文件，修改ipipMode（或vxlanMode）的属性值为CrossSubnet或Never便能启用直接路由网络。<br>下面的配置清单示例（default-ipv4-ippool.yaml）将spec.ipipMode的属性值从Never修改为CrossSubnet，表示仅在跨IP网络节点上的Pod间通信才使用IPIP隧道，同一网络节点上的Pod间通信则使用路由方式直接进行。</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">projectcalico.org/v3</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">IPPool</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">default-ipv4-ippool</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">blockSize:</span> <span class="number">24</span></span><br><span class="line">  <span class="attr">cidr:</span> <span class="number">10.244</span><span class="number">.0</span><span class="number">.0</span><span class="string">/16</span></span><br><span class="line">  <span class="attr">ipipMode:</span> <span class="string">CrossSubnet</span></span><br><span class="line">  <span class="attr">natOutgoing:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">nodeSelector:</span> <span class="string">all()</span></span><br><span class="line">  <span class="attr">vxlanMode:</span> <span class="string">Never</span></span><br></pre></td></tr></table></figure>
@@ -520,7 +514,7 @@
 <p>默认情况下，Calico的BGP网络工作在节点网格（node-to-node mesh）模型下，各节点间以对等方式广播路由，它仅适用于规模较小的集群环境。下面命令的结果显示的便是当前节点（k8s-master01）要对等广播路由的其他q节点，各节点打印的结果都会有所不同。随着节点数量的增多，这种对等广播的规模和数量将以指数级别上升。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mageedu@k8s-master01:~$ sudo calicoctl node status</span><br></pre></td></tr></table></figure>
 
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165208447.png" alt="image-20220218165208447"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165208447.png" alt="image-20220218165208447"></p>
 <p>中级集群环境应该使用全局对等BGP（global BGP peers）模型，通过在同一个二层网络中使用一个或一组BGP反射器构建BGP网络环境，大型集群环境甚至可以使用每节点对等BGP模型（per-node BGP peers），即分布式BGP反射器模型。Calico的节点代理calico/node自身就能够充当BGP路由反射器，我们可以在Kubernetes集群外部的专用主机上部署calico/node作为路由反射器，也可以在集群中选择专用的几个节点进行配置。<br>下面我们仅出于测试目的，将集群中的k8s-master01部署为集群中的路由反射器，来说明其配置过程。通常来说，配置集群节点成为路由反射器大体有3个步骤：配置选定的Node作为BGP路由反射器、配置所有节点作为BGP对等节点（BGPPeer）向路由反射器发送路由信息，以及禁用节点网格。</p>
 <ul>
 <li>（1）配置路由反射器</li>
@@ -543,7 +537,7 @@
 <p>新的BGPPeer资源定义了并非Node-to-Node的对等关系，因而在路由反射器节点和其他节点所看到的结果相差较大，因为路由反射器同集群中的所有节点对等，但其他节点仅会同路由反射器节点对等。下面命令运行在路由反射器（k8s-master01）之上，它已然能够与集群中的节点建立对等关系（自我对等的关系不会显示在命令结果中）。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mageedu@k8s-master01:~ $ sudo calicoctl node status</span><br></pre></td></tr></table></figure>
 
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165347240.png" alt="image-20220218165347240"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165347240.png" alt="image-20220218165347240"></p>
 <p>其中，输出结果中的PEER TYPE显示了对等通信的类型，常见的值有node-to-node mesh、node specific和global等，node specific表示与特定的节点对等，而省略node和nodeSelector字段时出现的global则表示全局对等。</p>
 <ul>
 <li>（3）禁用节点网格</li>
@@ -557,15 +551,15 @@
 <p>随后，由BGPPeer/bgppeer-demo资源定义的各Calico/Node与BGP路由反射器对等关系便会生效，下面的命令仍然是在路由反射器节点之上运行。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">~$ </span><span class="language-bash">sudo calicoctl node status</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165525797.png" alt="image-20220218165525797"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165525797.png" alt="image-20220218165525797"></p>
 <p>命令结果显示，由BGPPeer/bgppeer-demo资源定义的对等关系已然生效。我们可人为地关闭一个节点来模拟BGP对等节点故障，以验证其动态路由的管理能力。首先，我们关闭k8s-node03.ilinux.io主机，随后在路由反射器节点上重新获取对等节点的状态，可看到相应的故障信息。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mageedu@k8s-master01:~ $ sudo calicoctl node status</span><br></pre></td></tr></table></figure>
 
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165542731.png" alt="image-20220218165542731">随后，我们可以在任意节点上验证与k8s-node03.ilinux.io相关的路由条目被移除的结果。若该节点恢复后，相关路由条目会重新添加回来，则证明BGP路由反射器能够正确工作。考虑到可用性，建议在生产环境中配置多个路由反射器节点。</p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165542731.png" alt="image-20220218165542731">随后，我们可以在任意节点上验证与k8s-node03.ilinux.io相关的路由条目被移除的结果。若该节点恢复后，相关路由条目会重新添加回来，则证明BGP路由反射器能够正确工作。考虑到可用性，建议在生产环境中配置多个路由反射器节点。</p>
 <h2 id="网络策略"><a href="#网络策略" class="headerlink" title="网络策略"></a>网络策略</h2><p>网络策略是控制Pod资源组间以及与其他网络端点间如何进行通信的规范，它使用标签来分组Pod，并在该组Pod之上定义规则来管控其流量，从而为Kubernetes提供更为精细的流量控制以及租户隔离机制。NetworkPolicy资源是Kubernetes API的一等公民，管理员或用户可使用NetworkPolicy这一标准资源类型按需定义网络访问控制策略。</p>
-<h3 id="网络策略与配置基础"><a href="#网络策略与配置基础" class="headerlink" title="网络策略与配置基础"></a>网络策略与配置基础</h3><p>Kubernetes自身仅实现了NetworkPolicy API的规范，具体的策略实施要靠CNI网络插件完成，例如，Calico、Antrea、Canal和Weave等，但Flannel并不支持。<br>Calico的calico/kube-controllers是该项目中用于将用户定义的网络策略予以实现的组件，它主要依赖于在节点上构建iptables规则实现访问控制功能，如图10-28所示。其他支持网络策略的插件也有类似的将网络策略加以实现的“策略控制器”或“策略引擎”，它们通过API监听创建Pod时生成的新端点，并负责按需为其附加相关的网络策略。<br><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165659812.png" alt="image-20220218165659812"></p>
+<h3 id="网络策略与配置基础"><a href="#网络策略与配置基础" class="headerlink" title="网络策略与配置基础"></a>网络策略与配置基础</h3><p>Kubernetes自身仅实现了NetworkPolicy API的规范，具体的策略实施要靠CNI网络插件完成，例如，Calico、Antrea、Canal和Weave等，但Flannel并不支持。<br>Calico的calico/kube-controllers是该项目中用于将用户定义的网络策略予以实现的组件，它主要依赖于在节点上构建iptables规则实现访问控制功能，如图10-28所示。其他支持网络策略的插件也有类似的将网络策略加以实现的“策略控制器”或“策略引擎”，它们通过API监听创建Pod时生成的新端点，并负责按需为其附加相关的网络策略。<br><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165659812.png" alt="image-20220218165659812"></p>
 <p>Kubernetes默认并未对Pod之上的流量作为任何限制，Pod对象能够与集群上的其他任何Pod通信，也能够与集群外部的网络端点交互。NetworkPolicy是名称空间级别的资源，允许用户使用标签选择器在筛选出的一组Pod对象上分别管理Ingress和Egress流量。一旦将Network Policy引入到名称空间中，则被标签选择器“选中”的Pod将默认拒绝所有流量，而仅放行由特定的NetworlPolicy资源明确“允许”的流量。然而，未被任何NetworkPolicy资源的标签选择器选中的Pod对象的流量则不受影响。<br>换句话说，NetworkPolicy就是定义在一组Pod资源上的Ingress规则或Egress规则，或二者的组合定义，具体生效的范围则由“策略类型”（policyType)进行指定。Ingress和Egress规则的基本配置要素如图10-29所示。</p>
-<p><img src="/blog/2022/02/10/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165721382.png" alt="image-20220218165721382"></p>
+<p><img src="/blog/2022/02/23/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/image-20220218165721382.png" alt="image-20220218165721382"></p>
 <p>我们知道，NetworkPolicy是Kubernetes API中标准的资源类型，它同样由apiVersion、kind、metadata和spec等字段所定义，下面给出了其基本配置框架和简要注释信息。</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.k8s.io/v1</span> <span class="comment"># 资源隶属的API群组及版本号</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">NetworkPolicy</span>              <span class="comment"># 资源类型的名称</span></span><br><span class="line"><span class="attr">metadata:</span>                        <span class="comment"># 资源元数据</span></span><br><span class="line">  <span class="string">name</span> <span class="string">&lt;string&gt;</span>                  <span class="comment"># 资源名称标识</span></span><br><span class="line">  <span class="string">namespace</span> <span class="string">&lt;string&gt;</span>             <span class="comment"># NetworkPolicy是名称空间级别的资源</span></span><br><span class="line"><span class="attr">spec:</span>                            <span class="comment"># 期望的状态</span></span><br><span class="line">  <span class="string">podSelector</span> <span class="string">&lt;Object&gt;</span>  <span class="comment"># 当前规则生效的同一名称空间中的一组目标Pod对象，必选字段</span></span><br><span class="line">                                 <span class="comment"># 空值表示当前名称空间中的所有Pod资源</span></span><br><span class="line">  <span class="string">policyTypes</span> <span class="string">&lt;[]string&gt;</span>         <span class="comment"># Ingress表示生效ingress字段；Egress表示生效</span></span><br><span class="line"><span class="comment"># egress字段，同时提供表示二者均有效</span></span><br><span class="line"><span class="string">ingress</span> <span class="string">&lt;[]Object&gt;</span>               <span class="comment"># 入站流量源端点对象列表，即白名单，空值表示“所有”</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">from</span> <span class="string">&lt;[]Object&gt;</span>                <span class="comment"># 具体的端点对象列表，空值表示所有合法端点</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">ipBlock</span>  <span class="string">&lt;Object&gt;</span>            <span class="comment"># IP地址块范围内的端点，不能与另外两个字段同时使用</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">namespaceSelector</span> <span class="string">&lt;Object&gt;</span>   <span class="comment"># 匹配的名称空间内的端点</span></span><br><span class="line">     <span class="string">podSelector</span> <span class="string">&lt;Object&gt;</span>        <span class="comment"># 由Pod标签选择器匹配到的端点，空值表示&lt;none&gt;</span></span><br><span class="line">  <span class="string">ports</span> <span class="string">&lt;[]Object&gt;</span>      <span class="comment"># 具体的端口对象列表，空值表示所有合法端口</span></span><br><span class="line"><span class="string">engress</span> <span class="string">&lt;[]Object&gt;</span>      <span class="comment"># 出站流量目标端点对象列表，即白名单，空值表示“所有”</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">to</span> <span class="string">&lt;[]Object&gt;</span>                  <span class="comment"># 具体的端点对象列表，空值表示所有合法端点，格式同ingres.from；</span></span><br><span class="line">  <span class="string">ports</span> <span class="string">&lt;[]Object&gt;</span>               <span class="comment"># 具体的端口对象列表，空值表示所有合法端口</span></span><br></pre></td></tr></table></figure>
 
@@ -677,13 +671,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/blog/2022/02/10/ConfigMap/" rel="prev" title="ConfigMap和Secret">
-      <i class="fa fa-chevron-left"></i> ConfigMap和Secret
+    <a href="/blog/2022/02/21/%E8%AE%A4%E8%AF%81%E3%80%81%E6%8E%88%E6%9D%83%E4%B8%8E%E5%87%86%E5%85%A5%E6%8E%A7%E5%88%B6/" rel="prev" title="认证、授权与准入控制">
+      <i class="fa fa-chevron-left"></i> 认证、授权与准入控制
     </a></div>
-      <div class="post-nav-item">
-    <a href="/blog/2022/02/10/%E5%BA%94%E7%94%A8%E7%BC%96%E6%8E%92%E4%B8%8E%E7%AE%A1%E7%90%86-%E6%8E%A7%E5%88%B6%E5%99%A8/" rel="next" title="应用编排与管理(控制器)">
-      应用编排与管理(控制器) <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
