@@ -174,7 +174,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-02-24 16:13:36 / 修改时间：16:39:35" itemprop="dateCreated datePublished" datetime="2022-02-24T16:13:36+08:00">2022-02-24</time>
+              <time title="创建时间：2022-02-24 16:13:36 / 修改时间：16:42:16" itemprop="dateCreated datePublished" datetime="2022-02-24T16:13:36+08:00">2022-02-24</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -197,7 +197,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="本章小结"><a href="#本章小结" class="headerlink" title="本章小结"></a>本章小结</h2><p>本章讲解了Kubernetes Scheduler的基本工作逻辑，并详细讲解了几种高级调度功能的使用方法。</p>
+          <h1 id="本章小结"><a href="#本章小结" class="headerlink" title="本章小结"></a>本章小结</h1><p>本章讲解了Kubernetes Scheduler的基本工作逻辑，并详细讲解了几种高级调度功能的使用方法。</p>
 <ul>
 <li>经典调度策略：经过预选、优选、选定和绑定等步骤完成Pod调度，仅支持Predicate、Priority和Bind扩展点，且必须先由default-scheduler调度后才能生效。</li>
 <li>调度框架：支持QueueSort、PreFilter、Filter、PostFilter、PreScore、Score、Reserve、PreBind、Bind和Unreserve等扩展点，将内置的预选函数和优选函数全部实现为调度插件，并支持用户自定义插件。</li>
@@ -207,7 +207,7 @@
 <li>污点给节点提供了主动排斥Pod对象的方式，仅那些可以容忍节点污点的Pod可运行在相关节点之上。</li>
 <li>优选级和抢占功能为优化集群资源利用率、确保更重要工作负载的运行提供了可行性。</li>
 </ul>
-<h1 id="Pod资源调度"><a href="#Pod资源调度" class="headerlink" title="Pod资源调度"></a>Pod资源调度</h1><p>控制平面组件Kubernetes Scheduler就是为工作负载挑选最佳运行节点的调度器。</p>
+<h1 id="Pod资源调度器"><a href="#Pod资源调度器" class="headerlink" title="Pod资源调度器"></a>Pod资源调度器</h1><p>控制平面组件Kubernetes Scheduler就是为工作负载挑选最佳运行节点的调度器。</p>
 <h2 id="Kubernetes调度器"><a href="#Kubernetes调度器" class="headerlink" title="Kubernetes调度器"></a>Kubernetes调度器</h2><p>对于每个未绑定至任何工作节点的Pod对象，无论是新创建、被节点驱逐或节点故障等，Kubernetes Scheduler都要使用调度算法从集群中挑选一个最佳目标节点来运行它，如图11-1所示。<br><img src="/blog/2022/02/24/Pod%E8%B5%84%E6%BA%90%E8%B0%83%E5%BA%A6/image-20220223143559546.png" alt="image-20220223143559546">Kubernetes在v1.15版本之后引入的调度框架重构了此前使用的经典调度器架构，它以插件化的方式在多个扩展点实现了调度器的绝大多数功能，替代了经典调度器中以预选（predicate）函数和优选（priority）函数为核心的调度载体，并支持通过Scheduler Extender进行Webhook式扩展的架构，为用户扩展使用自定义调度插件提供了便捷的接口。</p>
 <h3 id="调度器基础"><a href="#调度器基础" class="headerlink" title="调度器基础"></a>调度器基础</h3><p>Kubernetes内置了适合绝大多数场景中需求的默认调度器，它支持同时使用算法基于原生及可定制的工具来选出集群中最适合运行当前Pod资源的一个节点。Scheduler是API Server的客户端，它注册并监听所有Pod资源规范中spec.nodeName字段的状态变动信息，并对该字段值为“空”的每个Pod对象启动调度机制。<br>调度器需要根据特定的调度要求对现有节点进行预选，以过滤掉那些无法满足Pod运行条件的节点，而后对满足过滤条件的各个节点进行打分，并按综合得分进行排序，最后从优先级排序结果中挑选出得分最高节点作为适合目标Pod的最佳节点。如果中间任何一个步骤返回了错误信息，调度器就会中止调度过程。调度流程的最后，调度程序在binding（绑定）的过程中将调度决策通知给API Server，如图11-2所示，而后由相应节点的代理程序kubelet启动Pod的创建和启动等过程。<br><img src="/blog/2022/02/24/Pod%E8%B5%84%E6%BA%90%E8%B0%83%E5%BA%A6/image-20220223143631380.png" alt="image-20220223143631380"></p>
 <blockquote>
