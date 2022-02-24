@@ -22,7 +22,7 @@
 
   <meta name="description" content="本章小结本章讲解了Kubernetes Scheduler的基本工作逻辑，并详细讲解了几种高级调度功能的使用方法。  经典调度策略：经过预选、优选、选定和绑定等步骤完成Pod调度，仅支持Predicate、Priority和Bind扩展点，且必须先由default-scheduler调度后才能生效。 调度框架：支持QueueSort、PreFilter、Filter、PostFilter、PreS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="器">
+<meta property="og:title" content="Pod资源调度器">
 <meta property="og:url" content="https://marmotad.github.io/2022/02/24/Pod%E8%B5%84%E6%BA%90%E8%B0%83%E5%BA%A6/index.html">
 <meta property="og:site_name" content="marmotad">
 <meta property="og:description" content="本章小结本章讲解了Kubernetes Scheduler的基本工作逻辑，并详细讲解了几种高级调度功能的使用方法。  经典调度策略：经过预选、优选、选定和绑定等步骤完成Pod调度，仅支持Predicate、Priority和Bind扩展点，且必须先由default-scheduler调度后才能生效。 调度框架：支持QueueSort、PreFilter、Filter、PostFilter、PreS">
@@ -42,7 +42,7 @@
 <meta property="og:image" content="https://marmotad.github.io/blog/2022/02/24/Pod%E8%B5%84%E6%BA%90%E8%B0%83%E5%BA%A6/image-20220224154830268.png">
 <meta property="og:image" content="https://marmotad.github.io/blog/2022/02/24/Pod%E8%B5%84%E6%BA%90%E8%B0%83%E5%BA%A6/image-20220223150232836.png">
 <meta property="article:published_time" content="2022-02-24T08:13:36.000Z">
-<meta property="article:modified_time" content="2022-02-24T08:36:39.310Z">
+<meta property="article:modified_time" content="2022-02-24T08:39:35.038Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="Kubernetes">
 <meta name="twitter:card" content="summary">
@@ -61,7 +61,7 @@
   };
 </script>
 
-  <title>器 | marmotad</title>
+  <title>Pod资源调度器 | marmotad</title>
   
 
 
@@ -181,7 +181,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          器
+          Pod资源调度器
         </h1>
 
         <div class="post-meta">
@@ -192,7 +192,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-02-24 16:13:36 / 修改时间：16:36:39" itemprop="dateCreated datePublished" datetime="2022-02-24T16:13:36+08:00">2022-02-24</time>
+              <time title="创建时间：2022-02-24 16:13:36 / 修改时间：16:39:35" itemprop="dateCreated datePublished" datetime="2022-02-24T16:13:36+08:00">2022-02-24</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
