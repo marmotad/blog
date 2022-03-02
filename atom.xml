@@ -6,7 +6,7 @@
   <link href="https://marmotad.github.io/atom.xml" rel="self"/>
   
   <link href="https://marmotad.github.io/"/>
-  <updated>2022-03-02T13:27:50.189Z</updated>
+  <updated>2022-03-02T13:47:06.162Z</updated>
   <id>https://marmotad.github.io/</id>
   
   <author>
@@ -15,6 +15,19 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>资源指标与集群监控</title>
+    <link href="https://marmotad.github.io/2022/03/02/%E8%B5%84%E6%BA%90%E6%8C%87%E6%A0%87%E4%B8%8E%E9%9B%86%E7%BE%A4%E7%9B%91%E6%8E%A7/"/>
+    <id>https://marmotad.github.io/2022/03/02/%E8%B5%84%E6%BA%90%E6%8C%87%E6%A0%87%E4%B8%8E%E9%9B%86%E7%BE%A4%E7%9B%91%E6%8E%A7/</id>
+    <published>2022-03-02T13:47:06.000Z</published>
+    <updated>2022-03-02T13:47:06.162Z</updated>
+    
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>应用管理(helm、Kustomize)</title>
